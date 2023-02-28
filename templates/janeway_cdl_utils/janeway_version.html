@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load i18n %}
+
+
+{% block title %}Janeway Version{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block body %}
+    <section id="content">
+        <div class="row">
+            <h3>{% trans "Janeway Version" %}</h3>
+            <br>
+            <h4>{% trans "How to Cite" %}</h4>
+            {% if not orig_article_archived %}<p style="color: red;">* This version of the entry, "{{ base_article.title }}," is not archived. We recommend citing a stable, archived version of the entry (if one is available).</p>{% endif %}
+            {% include "elements/journal/how_to_cite.html" with article=orig_article journal=journal %}
+            <h4>Version History</h4>
+            <table class="article-archive-table">
+                <tr>
+                    <th>Publication Date</th>
+                    <th>Version Type</th>
+                    <th>Archived?</th>
+                </tr>
+                {% for version in versions %}
+                <tr>
+                    <td>
+                        <a href="{{ version.local_url }}">{{ version.date_published| date:"F d, Y" }}</a>
+                    {% if version == orig_article %}
+                        <strong> (THIS VERSION)</strong>
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% if version.version %}
+                            <span data-tooltip aria-haspopup="true" class="has-tip" title="{{ version.version.update_type_info }}">{{ version.version.update_type }} update</span>
+                        {% else %}
+                            <span data-tooltip aria-haspopup="true" class="has-tip" title="The original version of this article">original</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if version.is_archived %}
+                            Yes ({% for issue in version.issues.all %}{% if issue.archive %}{% if not forloop.first %}; {% endif %}<a href="{% url 'journal_issue' issue.pk %}">{{ issue.issue_title }}</a>{% endif %}{% endfor %})
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            </ul>
+        </div>
+    </section>
+{% endblock %}
